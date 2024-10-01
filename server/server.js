@@ -1,8 +1,14 @@
 import express from 'express';
+import { MongoClient } from 'mongodb';
+import dotenv from "dotenv"; 
 
 //const express = require('express')
+dotenv.config(); 
 const app = express();
-const port = 3000;
+const PORT = 3000;
+const MONGO_URL = process.env.MONGO_DB_URL; 
+// const mongodb = MongoClient(mongoURL); 
+
 
 app.get('/', (_, res) => {
     console.log("test")
