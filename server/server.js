@@ -211,6 +211,64 @@ app.get('/api/planets/:id', async (req, res)=> {
     }
 })
 
+//get films by planet id
+app.get('/api/planets/:id/films', async (req,res) => { 
+    const planetId = Number(req.params.id); 
+    const aggregateQuery = [
+        {
+            $match: {id: planetId }
+          },
+        {
+          '$lookup': {
+            'from': 'films_planets', 
+            'localField': 'id', 
+            'foreignField': 'planet_id', 
+            'as': 'film_planets'
+          }
+        }, {
+          '$unwind': {
+            'path': '$film_planets', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$lookup': {
+            'from': 'films', 
+            'localField': 'film_planets.film_id', 
+            'foreignField': 'id', 
+            'as': 'films'
+          }
+        }, {
+          '$unwind': {
+            'path': '$films', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$group': {
+            '_id': '$_id', 
+            'fieldN': {
+              '$first': '$name'
+            }, 
+            'films': {
+              '$push': '$films.title'
+            }
+          }
+        }
+      ]; 
+      try{
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const collection = db.collection('planets');
+        const planetFilms = await collection.aggregate(aggregateQuery).toArray();
+        res.json(planetFilms);
+        } catch (err) { 
+            console.log("Error on GET /api/planets: ", err);
+            res.sendStatus(500); 
+        }
+})
+
+
 //get all planets 
 app.get('/api/planets', async (_, res)=> { 
     try{
@@ -224,7 +282,9 @@ app.get('/api/planets', async (_, res)=> {
         console.log("Error on GET /api/planets: ", err);
         res.sendStatus(500); 
     }
-})
+}); 
+
+
 
 
 
