@@ -24,7 +24,7 @@ export default function Character() {
   }, [id]);
 
   if (!character) {
-    return <div>Loading...</div>;
+    return <div className='loading'>Loading...</div>;
   }
 
   return (

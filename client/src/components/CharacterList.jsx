@@ -11,6 +11,10 @@ export default function CharacterList() {
       .catch((error) => console.error('Error fetching characters:', error));
   }, []);
 
+  if (!characters) {
+    return <div className='loading'>Loading...</div>;
+  }
+
   return (
     <div className='container'>
       <h1>Star Wars Characters</h1>

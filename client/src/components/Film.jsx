@@ -23,7 +23,7 @@ export default function Film() {
   }, [id]);
 
   if (!film) {
-    return <div>Loading...</div>;
+    return <div className='loading'>Loading...</div>;
   }
 
   return (

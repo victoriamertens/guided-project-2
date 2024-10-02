@@ -95,3 +95,9 @@ p {
   }
 }
 
+.loading {
+  font-weight: bold;
+  text-align: center;
+  padding-top: 24px;
+  font-size: 24px;
+}

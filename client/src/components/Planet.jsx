@@ -23,7 +23,7 @@ export default function Planet() {
   }, [id]);
 
   if (!planet) {
-    return <div>Loading...</div>;
+    return <div className='loading'>Loading...</div>;
   }
 
   return (
