@@ -308,7 +308,7 @@ app.get('/api/characters/:id/films/agg', async (req, res)=> {
             '$first': '$name'
           }, 
           'films': {
-            '$push': '$films.title'
+            '$push': {title: "$films.title", id: "$films.id"}
           }
         }
       }
@@ -368,7 +368,7 @@ app.get('/api/planets/:id/films/agg', async (req,res) => {
             '$first': '$name'
           }, 
           'films': {
-            '$push': '$films.title'
+            '$push': {title: "$films.title", id: "$films.id"}
           }
         }
       }
@@ -384,64 +384,6 @@ app.get('/api/planets/:id/films/agg', async (req,res) => {
           res.sendStatus(500); 
       }
 });
-
-//AGG get characters by planet id
-app.get('/api/planets/:id/characters/agg', async (req,res) => { 
-  const planetId = Number(req.params.id); 
-  const aggregateQuery = [
-      {
-          $match: {id: planetId }
-        },
-      {
-        '$lookup': {
-          'from': 'planets_characters', 
-          'localField': 'id', 
-          'foreignField': 'planet_id', 
-          'as': 'film_characters'
-        }
-      }, {
-        '$unwind': {
-          'path': '$film_characters', 
-          'includeArrayIndex': 'string', 
-          'preserveNullAndEmptyArrays': false
-        }
-      }, {
-        '$lookup': {
-          'from': 'films', 
-          'localField': 'film_planets.film_id', 
-          'foreignField': 'id', 
-          'as': 'films'
-        }
-      }, {
-        '$unwind': {
-          'path': '$films', 
-          'includeArrayIndex': 'string', 
-          'preserveNullAndEmptyArrays': false
-        }
-      }, {
-        '$group': {
-          '_id': '$_id', 
-          'fieldN': {
-            '$first': '$name'
-          }, 
-          'films': {
-            '$push': '$films.title'
-          }
-        }
-      }
-    ]; 
-    try{
-      const client = await MongoClient.connect(url);
-      const db = client.db(dbName);
-      const collection = db.collection('planets');
-      const planetFilms = await collection.aggregate(aggregateQuery).toArray();
-      res.json(planetFilms);
-      } catch (err) { 
-          console.log("Error on GET /api/planets: ", err);
-          res.sendStatus(500); 
-      }
-});
-
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}.`);
 });
