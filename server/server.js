@@ -19,7 +19,7 @@ const collections = {
 };
 
 app.use(cors());
-app.use(express.static('./public'));
+app.use(express.static("./public"));
 
 // Helper function to connect to the database
 const connectDB = async () => {
@@ -268,9 +268,9 @@ app.get("/api/planets/:id/films", async (req, res) => {
   }
 });
 
-//AGG get films by character 
-app.get('/api/characters/:id/films/agg', async (req, res)=> { 
-  const characterId = Number(req.params.id); 
+//AGG get films by character
+app.get("/api/characters/:id/films/agg", async (req, res) => {
+  const characterId = Number(req.params.id);
   const aggregateQuery = [
       {
           $match: {id: characterId }
@@ -314,23 +314,22 @@ app.get('/api/characters/:id/films/agg', async (req, res)=> {
       }
     ]; 
 
-  try{
-  const client = await MongoClient.connect(url);
-  const db = client.db(dbName);
-  const collection = db.collection('characters');
-  const characterFilms = await collection.aggregate(aggregateQuery).toArray();
-  console.log("CHAR FILM:", characterFilms);
-  res.json(characterFilms);
-  } catch (err) { 
-      console.log("Error on GET /api/characters/:id/films: ", err);
-      res.sendStatus(500); 
+  try {
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection("characters");
+    const characterFilms = await collection.aggregate(aggregateQuery).toArray();
+    console.log("CHAR FILM:", characterFilms);
+    res.json(characterFilms);
+  } catch (err) {
+    console.log("Error on GET /api/characters/:id/films: ", err);
+    res.sendStatus(500);
   }
 });
 
-
 //AGG get films by planet id
-app.get('/api/planets/:id/films/agg', async (req,res) => { 
-  const planetId = Number(req.params.id); 
+app.get("/api/planets/:id/films/agg", async (req, res) => {
+  const planetId = Number(req.params.id);
   const aggregateQuery = [
       {
           $match: {id: planetId }
