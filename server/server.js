@@ -367,23 +367,21 @@ app.get('/api/planets/:id/characters/agg', async (req,res) => {
             res.sendStatus(500); 
         }
 })
-//GET characters by planet id
+
 app.get('/api/planets/:id/characters', async (req, res) => {
     try {
         const client = await MongoClient.connect(url);
         const db = client.db(dbName);
-        const filmId = parseInt(req.params.id);  
+        const planetId = parseInt(req.params.id);  
         
-        const filmsPlanetsCollection = db.collection(filmsPlanetsCollectionName);
-        const planetsCollection = db.collection(planetsCollectionName);
-        
-        const filmPlanets = await filmsPlanetsCollection.find({ film_id: filmId }).toArray();
-        const planetIds = filmPlanets.map(fp => fp.planet_id); 
+        const charactersCollection = db.collection(charactersCollectionName);
+        console.log("PLANET ID:", planetId , typeof(planetId));
+        console.log("CONNECTIONS:", url, dbName, planetId, charactersCollectionName);
 
-        const planets = await planetsCollection.find({ id: { $in: planetIds } }).toArray();
-
+        const characters = await charactersCollection.find({'homeworld': planetId}).toArray();
+        console.log("CHAR:", characters);
         client.close();
-        res.json(planets);
+        res.json(characters);
     } catch (error) {
         res.status(500).send(error);
     }
