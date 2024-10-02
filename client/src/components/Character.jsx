@@ -21,12 +21,16 @@ export default function Character() {
     fetch(`${import.meta.env.VITE_SWAPI_API_URL}/characters/${id}/planets`)
       .then((response) => response.json())
       .then((data) => setPlanets(data));
+
+
+
   }, [id]);
 
   if (!character) {
     return <div className="loading">Loading...</div>;
   }
-
+let homeplanet = planets.filter(pl => pl.id === character.homeworld); 
+console.log(homeplanet);
   return (
     <div className="container">
       <HomeButton />
@@ -54,7 +58,7 @@ export default function Character() {
           <strong>Birth Year:</strong> {character.birth_year}
         </p>
         <p>
-          <strong>Homeworld ID:</strong> {character.homeworld}
+          <strong>Homeworld:</strong> {homeplanet[0]?.name}
         </p>
       </div>
 
