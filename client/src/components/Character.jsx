@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import HomeButton from './HomeButton';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import HomeButton from "./HomeButton";
 
 export default function Character() {
   const { id } = useParams();
@@ -24,7 +24,7 @@ export default function Character() {
   }, [id]);
 
   if (!character) {
-    return <div className='loading'>Loading...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   return (
@@ -32,33 +32,49 @@ export default function Character() {
       <HomeButton />
       <h2>{character.name}</h2>
       <div className="character-details">
-        <p><strong>Gender:</strong> {character.gender}</p>
-        <p><strong>Height:</strong> {character.height} cm</p>
-        <p><strong>Mass:</strong> {character.mass} kg</p>
-        <p><strong>Hair Color:</strong> {character.hair_color}</p>
-        <p><strong>Skin Color:</strong> {character.skin_color}</p>
-        <p><strong>Eye Color:</strong> {character.eye_color}</p>
-        <p><strong>Birth Year:</strong> {character.birth_year}</p>
-        <p><strong>Homeworld ID:</strong> {character.homeworld}</p>
+        <p>
+          <strong>Gender:</strong> {character.gender}
+        </p>
+        <p>
+          <strong>Height:</strong> {character.height} cm
+        </p>
+        <p>
+          <strong>Mass:</strong> {character.mass} kg
+        </p>
+        <p>
+          <strong>Hair Color:</strong> {character.hair_color}
+        </p>
+        <p>
+          <strong>Skin Color:</strong> {character.skin_color}
+        </p>
+        <p>
+          <strong>Eye Color:</strong> {character.eye_color}
+        </p>
+        <p>
+          <strong>Birth Year:</strong> {character.birth_year}
+        </p>
+        <p>
+          <strong>Homeworld ID:</strong> {character.homeworld}
+        </p>
       </div>
 
       <h3>Films</h3>
-        <ul>
-          {films.map((film) => (
-            <li key={film.id}>
-              <Link to={`/film/${film.id}`}>{film.title}</Link>
-            </li>
-          ))}
-        </ul>
+      <ul>
+        {films.map((film) => (
+          <li key={film.id}>
+            <Link to={`/film/${film.id}`}>{film.title}</Link>
+          </li>
+        ))}
+      </ul>
 
-        <h3>Planets</h3>
-        <ul>
-          {planets.map((planet) => (
-            <li key={planet.id}>
-              <Link to={`/planet/${planet.id}`}>{planet.name}</Link>
-            </li>
-          ))}
-        </ul>
+      <h3>Planets</h3>
+      <ul>
+        {planets.map((planet) => (
+          <li key={planet.id}>
+            <Link to={`/planet/${planet.id}`}>{planet.name}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
