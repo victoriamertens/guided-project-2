@@ -1,42 +1,103 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+.container {
   padding: 2rem;
+  margin-top: 50px;
+  max-width: 1200px;
+  margin: 50px auto;
+}
+
+.character-list, .film-list, .planet-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+ul li {
+  width: 100%;
+  text-align: center;
+  background-color: rgba(51, 51, 51, 0.8); 
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease;
+}
+
+ul li:hover {
+  background-color: rgba(80, 80, 80, 0.9);
+}
+
+ul li a {
+  font-weight: bold;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+.character-details, .film-details, .planet-details {
+  background-color: rgba(0, 0, 0, 0.8); 
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 20px auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  text-align: left;
+}
+
+.character-details h2, .film-details h2, .planet-details h2 {
+  margin-bottom: 20px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+h3 {
+  color: #FFD700;
+  margin-top: 30px;
+  margin-bottom: 10px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+p {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.home-button {
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none; 
+  transition: transform 0.2s;
+}
+
+.home-button:hover {
+  transform: scale(1.1);
+}
+
+.home-icon {
+  font-size: 24px; 
+}
+
+@media (max-width: 768px) {
+  .character-details, .film-details, .planet-details {
+    padding: 20px;
   }
-  to {
-    transform: rotate(360deg);
+
+  ul li {
+    font-size: 1.1rem;
+    padding: 10px 15px;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.loading {
+  font-weight: bold;
+  text-align: center;
+  padding-top: 24px;
+  font-size: 24px;
 }
