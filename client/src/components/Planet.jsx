@@ -25,7 +25,7 @@ export default function Planet() {
   if (!planet) {
     return <div className="loading">Loading...</div>;
   }
-
+console.log("POP:",planet);
   return (
     <div className="container">
       <HomeButton />
@@ -54,7 +54,7 @@ export default function Planet() {
         </p>
         <p>
           <strong>Population:</strong>{" "}
-          {parseInt(planet.population).toLocaleString()}
+          {typeof(planet.population) === 'string' ? planet.population : parseInt(planet.population).toLocaleString()}
         </p>
       </div>
 
