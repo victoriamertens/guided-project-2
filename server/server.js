@@ -15,10 +15,10 @@ app.get('/', (_, res) => {
     res.send('Hello world.')
 })
 
-app.get('/api/planets', (_, res) => {
-    res.send('Planets')
-})
 
+//get films by character 
+
+//get character by id
 app.get('/api/characters/:id', async (req, res)=> { 
     const characterId = Number(req.params.id); 
     console.log("In get characters by id route:", characterId);
@@ -34,6 +34,7 @@ app.get('/api/characters/:id', async (req, res)=> {
     }
 })
 
+//get all characters 
 app.get('/api/characters', async (_, res)=> { 
     try{
     const client = await MongoClient.connect(MONGO_URL);
@@ -44,6 +45,37 @@ app.get('/api/characters', async (_, res)=> {
     res.json(characters);
     } catch (err) { 
         console.log("Error on GET /api/characters: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+//get planet by id
+app.get('/api/planets/:id', async (req, res)=> { 
+    const characterId = Number(req.params.id); 
+    console.log("In get planets by id route:", characterId);
+    try{
+    const client = await MongoClient.connect(MONGO_URL);
+    const db = client.db(DB_NAME);
+    const collection = db.collection('planets');
+    const planets = await collection.find({"id" : characterId}).toArray();
+    res.json(planets);
+    } catch (err) { 
+        console.log("Error on GET /api/planets: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+//get all planets 
+app.get('/api/planets', async (_, res)=> { 
+    try{
+    const client = await MongoClient.connect(MONGO_URL);
+    const db = client.db(DB_NAME);
+    const collection = db.collection('planets');
+    const planets = await collection.find({}).toArray();
+    console.log("planets:" , collection);
+    res.json(planets);
+    } catch (err) { 
+        console.log("Error on GET /api/planets: ", err);
         res.sendStatus(500); 
     }
 })
