@@ -15,6 +15,13 @@ const planetsCollectionName = process.env.COLLECTION_PLANETS;
 const filmsPlanetsCollectionName = process.env.COLLECTION_FILMS_PLANETS;
 const filmsCharactersCollectionName = process.env.COLLECTION_FILMS_CHARACTERS;
 
+
+app.get('/', (_, res) => {
+    console.log("test")
+    res.send('Hello world.')
+})
+
+
 // Route to get all films
 app.get('/api/films', async (req, res) => {
     try {
@@ -98,6 +105,129 @@ app.get('/api/films/:id/planets', async (req, res) => {
     }
 });
 
+//get films by character 
+  app.get('/api/characters/:id/films', async (req, res)=> { 
+    const characterId = Number(req.params.id); 
+    const aggregateQuery = [
+        {
+            $match: {id: characterId }
+          },
+        {
+          '$lookup': {
+            'from': 'films_characters', 
+            'localField': 'id', 
+            'foreignField': 'character_id', 
+            'as': 'character_films'
+          }
+        }, {
+          '$unwind': {
+            'path': '$character_films', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$lookup': {
+            'from': 'films', 
+            'localField': 'character_films.film_id', 
+            'foreignField': 'id', 
+            'as': 'films'
+          }
+        }, {
+          '$unwind': {
+            'path': '$films', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$group': {
+            '_id': '$_id', 
+            'fieldN': {
+              '$first': '$name'
+            }, 
+            'films': {
+              '$push': '$films.title'
+            }
+          }
+        }
+      ]; 
+
+    try{
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection('characters');
+    const characterFilms = await collection.aggregate(aggregateQuery).toArray();
+    console.log("CHAR FILM:", characterFilms);
+    res.json(characterFilms);
+    } catch (err) { 
+        console.log("Error on GET /api/characters/:id/films: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+//get character by id
+app.get('/api/characters/:id', async (req, res)=> { 
+    const characterId = Number(req.params.id); 
+    console.log("In get characters by id route:", characterId);
+    try{
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection('characters');
+    const characters = await collection.find({"id" : characterId}).toArray();
+    res.json(characters);
+    } catch (err) { 
+        console.log("Error on GET /api/characters: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+//get all characters 
+app.get('/api/characters', async (_, res)=> { 
+    try{
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection('characters');
+    const characters = await collection.find({}).toArray();
+    console.log("CHARACTERS:" , collection);
+    res.json(characters);
+    } catch (err) { 
+        console.log("Error on GET /api/characters: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+//get planet by id
+app.get('/api/planets/:id', async (req, res)=> { 
+    const characterId = Number(req.params.id); 
+    console.log("In get planets by id route:", characterId);
+    try{
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection('planets');
+    const planets = await collection.find({"id" : characterId}).toArray();
+    res.json(planets);
+    } catch (err) { 
+        console.log("Error on GET /api/planets: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+//get all planets 
+app.get('/api/planets', async (_, res)=> { 
+    try{
+    const client = await MongoClient.connect(url);
+    const db = client.db(dbName);
+    const collection = db.collection('planets');
+    const planets = await collection.find({}).toArray();
+    console.log("planets:" , collection);
+    res.json(planets);
+    } catch (err) { 
+        console.log("Error on GET /api/planets: ", err);
+        res.sendStatus(500); 
+    }
+})
+
+
+
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+    console.log(`Server is running at http://localhost:${port}.`)
+})
