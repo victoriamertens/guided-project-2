@@ -105,8 +105,8 @@ app.get('/api/films/:id/planets', async (req, res) => {
     }
 });
 
-//get films by character 
-  app.get('/api/characters/:id/films', async (req, res)=> { 
+//AGG get films by character 
+  app.get('/api/characters/:id/films/agg', async (req, res)=> { 
     const characterId = Number(req.params.id); 
     const aggregateQuery = [
         {
@@ -164,6 +164,28 @@ app.get('/api/films/:id/planets', async (req, res) => {
     }
 })
 
+// Route to get planets for a specific film by film ID
+app.get('/api/characters/:id/films', async (req, res) => {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const characterId = parseInt(req.params.id);  
+        
+        const filmsCharactersCollection = db.collection(filmsCharactersCollectionName);
+        const filmsCollection = db.collection(filmsCollectionName);
+        
+        const filmCharacters = await filmsCharactersCollection.find({ character_id: characterId }).toArray();
+        const filmsIds = filmCharacters.map(fp => fp.film_id); 
+
+        const planets = await filmsCollection.find({ id: { $in: filmsIds } }).toArray();
+
+        client.close();
+        res.json(planets);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
 //get character by id
 app.get('/api/characters/:id', async (req, res)=> { 
     const characterId = Number(req.params.id); 
@@ -211,8 +233,8 @@ app.get('/api/planets/:id', async (req, res)=> {
     }
 })
 
-//get films by planet id
-app.get('/api/planets/:id/films', async (req,res) => { 
+//AGG get films by planet id
+app.get('/api/planets/:id/films/agg', async (req,res) => { 
     const planetId = Number(req.params.id); 
     const aggregateQuery = [
         {
@@ -267,6 +289,105 @@ app.get('/api/planets/:id/films', async (req,res) => {
             res.sendStatus(500); 
         }
 })
+//Get films by planet id 
+app.get('/api/planets/:id/films', async (req, res) => {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const planetId = parseInt(req.params.id);  
+        
+        const filmsPlanetsCollection = db.collection(filmsPlanetsCollectionName);
+        const filmsCollection = db.collection(filmsCollectionName);
+        
+        const planetFilms = await filmsPlanetsCollection.find({ planet_id: planetId }).toArray();
+        const filmsIds = planetFilms.map(fp => fp.film_id); 
+
+        const planets = await filmsCollection.find({ id: { $in: filmsIds } }).toArray();
+
+        client.close();
+        res.json(planets);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+//AGG get characters by planet id
+app.get('/api/planets/:id/characters/agg', async (req,res) => { 
+    const planetId = Number(req.params.id); 
+    const aggregateQuery = [
+        {
+            $match: {id: planetId }
+          },
+        {
+          '$lookup': {
+            'from': 'planets_characters', 
+            'localField': 'id', 
+            'foreignField': 'planet_id', 
+            'as': 'film_characters'
+          }
+        }, {
+          '$unwind': {
+            'path': '$film_characters', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$lookup': {
+            'from': 'films', 
+            'localField': 'film_planets.film_id', 
+            'foreignField': 'id', 
+            'as': 'films'
+          }
+        }, {
+          '$unwind': {
+            'path': '$films', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$group': {
+            '_id': '$_id', 
+            'fieldN': {
+              '$first': '$name'
+            }, 
+            'films': {
+              '$push': '$films.title'
+            }
+          }
+        }
+      ]; 
+      try{
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const collection = db.collection('planets');
+        const planetFilms = await collection.aggregate(aggregateQuery).toArray();
+        res.json(planetFilms);
+        } catch (err) { 
+            console.log("Error on GET /api/planets: ", err);
+            res.sendStatus(500); 
+        }
+})
+//GET characters by planet id
+app.get('/api/planets/:id/characters', async (req, res) => {
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const filmId = parseInt(req.params.id);  
+        
+        const filmsPlanetsCollection = db.collection(filmsPlanetsCollectionName);
+        const planetsCollection = db.collection(planetsCollectionName);
+        
+        const filmPlanets = await filmsPlanetsCollection.find({ film_id: filmId }).toArray();
+        const planetIds = filmPlanets.map(fp => fp.planet_id); 
+
+        const planets = await planetsCollection.find({ id: { $in: planetIds } }).toArray();
+
+        client.close();
+        res.json(planets);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
 
 
 //get all planets 
