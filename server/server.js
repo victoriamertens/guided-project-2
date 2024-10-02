@@ -18,6 +18,68 @@ app.get('/', (_, res) => {
 
 //get films by character 
 
+
+
+  app.get('/api/characters/:id/films', async (req, res)=> { 
+    const characterId = Number(req.params.id); 
+    const aggregateQuery = [
+        {
+            $match: {id: characterId }
+          },
+        {
+          '$lookup': {
+            'from': 'films_characters', 
+            'localField': 'id', 
+            'foreignField': 'character_id', 
+            'as': 'character_films'
+          }
+        }, {
+          '$unwind': {
+            'path': '$character_films', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$lookup': {
+            'from': 'films', 
+            'localField': 'character_films.film_id', 
+            'foreignField': 'id', 
+            'as': 'films'
+          }
+        }, {
+          '$unwind': {
+            'path': '$films', 
+            'includeArrayIndex': 'string', 
+            'preserveNullAndEmptyArrays': false
+          }
+        }, {
+          '$group': {
+            '_id': '$_id', 
+            'fieldN': {
+              '$first': '$name'
+            }, 
+            'films': {
+              '$push': '$films.title'
+            }
+          }
+        }
+      ]; 
+
+    
+    console.log("In get character films by id route:", characterId);
+    try{
+    const client = await MongoClient.connect(MONGO_URL);
+    const db = client.db(DB_NAME);
+    const collection = db.collection('characters');
+    const characterFilms = await collection.aggregate(aggregateQuery).toArray();
+    console.log("CHAR FILM:", characterFilms);
+    res.json(characterFilms);
+    } catch (err) { 
+        console.log("Error on GET /api/characters/:id/films: ", err);
+        res.sendStatus(500); 
+    }
+})
+
 //get character by id
 app.get('/api/characters/:id', async (req, res)=> { 
     const characterId = Number(req.params.id); 
