@@ -19,10 +19,7 @@ const collections = {
 };
 
 app.use(cors());
-
-app.get("/", (_, res) => {
-  res.send("Hello world.");
-});
+app.use(express.static('./public'));
 
 // Helper function to connect to the database
 const connectDB = async () => {
